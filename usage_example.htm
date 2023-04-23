@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta viewport="width=device-width, initial-scale=1">
+    <title>opl_plr.js usage example</title>
+</head>
+
+<body>
+    <!-- Attribution for used libraries -->
+    <div>Uses <a href="https://github.com/nukeykt/Nuked-OPL3">Nuked-OPL3</a> by Nuke.YKT [<a href="nuked-LICENSE">LGPL 2.1</a>]</div>
+
+    <!-- Import an OPL3 emulator, Nuked OPL3 in this case -->
+    <script src="nuked_opl3.js"></script>
+    <!-- Import opl_plr.js -->
+    <script src="opl_plr.js"></script>
+
+    <script>
+        // Instantiate the player
+        const plr = new opl_plr();
+
+        // Load a demo tune
+        fetch("kvee_-_128.imf")
+            .then(d => d.arrayBuffer())
+            // Call processImf for IMF files, the second argument is the playback rate in Hz, typically 560.
+            // Also available: processRaw(data), processDro(data), processVgm(data, loopRepeat)
+            .then(ab => plr.processImf(ab, 560))
+            .then(soundData => {
+                // Load the processed data into the player.
+                plr.loadSoundData(soundData);
+
+                var playButton = document.createElement("input");
+                playButton.type = "button";
+                var seekButton = document.createElement("input");
+                seekButton.type = "button";
+                var stopButton = document.createElement("input");
+                stopButton.type = "button";
+                var timeInfoDiv = document.createElement("div");
+                document.body.appendChild(playButton);
+                document.body.appendChild(seekButton);
+                document.body.appendChild(stopButton);
+                document.body.appendChild(timeInfoDiv);
+
+                // Play the loaded data.
+                playButton.value = "Play";
+                playButton.onclick = plr.play;
+
+                // Seek to 0 seconds.
+                seekButton.value = "Seek to 0:00";
+                seekButton.onclick = () => plr.seek(0);
+
+                // Stop (pause) playback.
+                stopButton.value = "Stop";
+                stopButton.onclick = plr.stop;
+
+                // Retrieve time information.
+                setInterval(() => { timeInfoDiv.textContent = `Playing: ${plr.isPlaying()} ${plr.getPlaybackTime().toFixed(2)} / ${plr.getTotalTime().toFixed(2)}` }, 10);
+            });
+    </script>
+</body>
+
+</html>
