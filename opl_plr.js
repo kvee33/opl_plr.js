@@ -420,8 +420,21 @@ function opl_plr() {
                         break;
 
                     default:
-                        console.error("Unknown command", arr[i].toString(16), "at offset", i);
-                        return;
+                        console.warn("Unknown command", arr[i].toString(16), "at offset", i);
+
+                        // Skip known reserved ranges
+                        if (arr[i] >= 0x30 && arr[i] <= 0x3F)
+                            i++;
+                        else if (arr[i] >= 0x41 && arr[i] <= 0x4E)
+                            i += (version < 160) ? 1 : 2;
+                        else if ((arr[i] >= 0xC9 && arr[i] <= 0xCF) || (arr[i] >= 0xD7 && arr[i] <= 0xDF))
+                            i += 3;
+                        else if (arr[i] >= 0xE2 && arr[i] <= 0xFF)
+                            i += 4;
+                        else
+                            return;
+
+                        break;
                 }
             }
         }
